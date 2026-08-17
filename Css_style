@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Bengali', sans-serif; }
+body { background-color: #f5f6f8; color: #333; }
+
+/* Header */
+header { background-color: #20a897; color: white; padding: 15px 20px; }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.category-switch { display: flex; gap: 5px; background: rgba(255,255,255,0.2); padding: 5px; border-radius: 25px; }
+.cat-btn { background: transparent; border: none; color: white; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+.cat-btn.active { background: white; color: #20a897; }
+.header-info { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.support-badge, .timer-badge { background-color: rgba(0, 0, 0, 0.15); display: inline-block; padding: 6px 15px; border-radius: 20px; font-size: 14px; }
+.finish-btn { background-color: #ff5a79; color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+/* Main Area */
+.main-container { display: flex; background: white; min-height: calc(100vh - 200px); }
+.palette { width: 60px; background: #f0f3f4; padding: 15px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; border-right: 1px solid #e0e0e0; }
+.pal-btn { width: 35px; height: 35px; border-radius: 50%; border: none; background: #cfd8dc; cursor: pointer; }
+.pal-btn.answered { background: #4caf50; color: white; }
+.pal-btn.current { background: #ffc107; }
+
+.question-area { flex: 1; padding: 20px; }
+.option-box { display: flex; align-items: center; border: 1px solid #dcdcdc; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; cursor: pointer; }
+.option-box.selected { border: 2px solid #20a897; background-color: #e8f5f4; }
+
+/* Admin & Nav */
+.bottom-nav { display: flex; justify-content: space-between; padding: 15px 20px; background: #fff; border-top: 1px solid #eee; }
+.nav-btn { padding: 10px 20px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; }
+.btn-gray { background: #607d8b; }
+.btn-teal { background: #20a897; }
+
+.admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+@media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
+.admin-q-item { background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-left: 4px solid #20a897; display: flex; justify-content: space-between; align-items: center; }
+.del-btn { background: #ff5a79; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
