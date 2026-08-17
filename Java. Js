@@ -1,0 +1,345 @@
+// ফায়ারবেস মডিউল ইম্পোর্ট করা হচ্ছে
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+// আপনার নতুন ফায়ারবেস কনফিগারেশন
+const firebaseConfig = {
+  apiKey: "AIzaSyDJXxpKvgPGeRcDSRP02ZclHCbtekokwhs",
+  authDomain: "takamolcbt.firebaseapp.com",
+  projectId: "takamolcbt",
+  storageBucket: "takamolcbt.firebasestorage.app",
+  messagingSenderId: "1012141835959",
+  appId: "1:1012141835959:web:a8dfe2c2625443169baf32",
+  measurementId: "G-DDHKPYWGQN"
+};
+
+// ফায়ারবেস ইনিশিয়ালাইজেশন
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const dbRef = doc(db, "takamulExam", "questionsData");
+
+// ডিফল্ট ডাটা (সার্ভার সম্পূর্ণ খালি থাকলে প্রথমবার এটি আপলোড হবে)
+const defaultData = {
+    Cleaner: [
+        { q: "মেঝে পরিষ্কার করার সময় কোন সাইনবোর্ড ব্যবহার করা জরুরি?", opts: ["ভেজা মেঝে (Wet Floor)", "বিপদজনক", "থামুন", "ধূমপান নিষেধ"], ans: 0 },
+        { q: "কেমিক্যাল ব্যবহারের সময় কী পরা উচিত?", opts: ["গ্লাভস ও মাস্ক", "শুধু চশমা", "স্যান্ডেল", "খালি হাত"], ans: 0 },
+        { q: "ডাস্টবিন কতক্ষণ পর পর পরিষ্কার করা উচিত?", opts: ["প্রতিদিন", "মাসে একবার", "বছরে একবার", "গন্ধ বের হলে"], ans: 0 },
+        { q: "টয়লেট পরিষ্কারের জন্য আলাদা ব্রাশ ব্যবহার করা উচিত?", opts: ["হ্যাঁ", "না"], ans: 0 },
+        { q: "ব্লিচিং পাউডার এবং এসিড একসাথে মেশানো নিরাপদ?", opts: ["সত্য", "মিথ্যা"], ans: 1 },
+        { q: "পরিষ্কারের শেষে হাত সাবান দিয়ে ধোয়া উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 0 },
+        { q: "ভেজা হাতে বৈদ্যুতিক সুইচ ধরা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "গ্লাস পরিষ্কার করার জন্য পেপার বা নরম কাপড় ব্যবহার করা উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 0 },
+        { q: "ময়লা পানি রাস্তায় ফেলা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "কাজের জায়গায় খাবার খাওয়া উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 1 },
+        { q: "ফ্লোর মোছার পর ফ্যান ছেড়ে শুকানো উচিত?", opts: ["হ্যাঁ", "না"], ans: 0 },
+        { q: "রাসায়নিক পদার্থের বোতলে লেবেল থাকা জরুরি?", opts: ["সত্য", "মিথ্যা"], ans: 0 },
+        { q: "মাস্ক ছাড়া অতিরিক্ত ধুলা পরিষ্কার করা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "পরিষ্কারের যন্ত্রপাতি কাজ শেষে গুছিয়ে রাখা উচিত?", opts: ["হ্যাঁ", "না"], ans: 0 },
+        { q: "কার্পেট পরিষ্কার করার জন্য ভ্যাকুয়াম ক্লিনার ব্যবহার করা উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 0 }
+    ],
+    LoadUnload: [
+        { q: "ভারী জিনিস তোলার সময় শরীরের কোন অংশের ওপর জোর দেওয়া উচিত?", opts: ["পা", "কোমর", "হাত", "ঘাড়"], ans: 0 },
+        { q: "লোড ও আনলোড কাজের সময় জায়গার অবস্থা কেমন হওয়া উচিত?", opts: ["পরিষ্কার ও শুকনো", "পিচ্ছিল", "অপরিষ্কার", "অন্ধকার"], ans: 0 },
+        { q: "নিরাপত্তার জন্য মাথায় কী পরা বাধ্যতামূলক?", opts: ["হেলমেট", "ক্যাপ", "গামছা", "কিছুই না"], ans: 0 },
+        { q: "কাজ শেষে যন্ত্রপাতি কোথায় রাখা উচিত?", opts: ["নির্দিষ্ট স্টোরে", "রাস্তায়", "পকেটে", "যেকোনো জায়গায়"], ans: 0 },
+        { q: "ভারী বস্তু একা তোলা নিরাপদ?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "পিচ্ছিল ফ্লোরে ভারী মাল টানা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "ফর্কলিফ্ট চালানোর জন্য লাইসেন্স থাকা জরুরি?", opts: ["সত্য", "মিথ্যা"], ans: 0 },
+        { q: "কাজের সময় ঢিলেঢালা পোশাক পরা নিরাপদ?", opts: ["সত্য", "মিথ্যা"], ans: 1 },
+        { q: "মাল তোলার সময় পিঠ সোজা রাখা উচিত?", opts: ["হ্যাঁ", "না"], ans: 0 },
+        { q: "চলন্ত ফর্কলিফ্টের সামনে হাঁটা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "ভারী মাল তোলার সময় গ্লাভস পরা উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 0 },
+        { q: "মাল আনলোডের সময় ট্রাকের ইঞ্জিন চালু রাখা নিরাপদ?", opts: ["সত্য", "মিথ্যা"], ans: 1 },
+        { q: "কাজের জায়গায় পর্যাপ্ত আলো থাকা জরুরি?", opts: ["হ্যাঁ", "না"], ans: 0 },
+        { q: "একসাথে অনেক বেশি মাল তোলা উচিত?", opts: ["হ্যাঁ", "না"], ans: 1 },
+        { q: "ট্রলি ব্যবহারের আগে চাকা চেক করা উচিত?", opts: ["সত্য", "মিথ্যা"], ans: 0 }
+    ]
+};
+
+let allData = { Cleaner: [], LoadUnload: [] };
+let activeCat = 'Cleaner';
+let currentQuestions = [];
+let currentIndex = 0;
+let userAnswers = {};
+const optionLabels = ['A', 'B', 'C', 'D'];
+
+const qText = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+let timeLeft = 30 * 60;
+let timerInt;
+
+// ১. ফায়ারবেস থেকে ডাটা লোড করার ফাংশন
+async function fetchQuestionsFromFirebase() {
+    try {
+        const docSnap = await getDoc(dbRef);
+        if (docSnap.exists()) {
+            allData = docSnap.data();
+        } else {
+            await setDoc(dbRef, defaultData);
+            allData = defaultData;
+        }
+        initExam();
+    } catch (error) {
+        console.error("Firebase Error:", error);
+        qText.innerText = "সার্ভার কানেক্ট করতে সমস্যা হচ্ছে! আপনার ইন্টারনেট কানেকশন বা Firestore Rules চেক করুন।";
+    }
+}
+
+// ২. ফায়ারবেসে ডাটা সেভ করার ফাংশন
+async function saveDataToFirebase() {
+    try {
+        await setDoc(dbRef, allData);
+        alert("সার্ভারে সফলভাবে সেভ হয়েছে!");
+    } catch (error) {
+        console.error("Firebase Update Error:", error);
+        alert("সেভ হতে সমস্যা হয়েছে! দয়া করে ইন্টারনেট কানেকশন চেক করুন।");
+    }
+}
+
+function startTimer() {
+    clearInterval(timerInt);
+    timeLeft = 30 * 60;
+    timerInt = setInterval(() => {
+        if (timeLeft <= 0) { clearInterval(timerInt); window.submitExam(); }
+        else {
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+    }, 1000);
+}
+
+window.switchCategory = function(cat) {
+    activeCat = cat;
+    document.getElementById('tab-cleaner').classList.remove('active');
+    document.getElementById('tab-load').classList.remove('active');
+    
+    if(cat === 'Cleaner') document.getElementById('tab-cleaner').classList.add('active');
+    else document.getElementById('tab-load').classList.add('active');
+
+    userAnswers = {};
+    initExam();
+}
+
+function initExam() {
+    currentQuestions = allData[activeCat] || [];
+    currentIndex = 0;
+    
+    if(currentQuestions.length === 0) {
+        document.getElementById('q-circle-num').innerText = "?";
+        qText.innerText = "এই ক্যাটাগরিতে কোনো প্রশ্ন নেই। এডমিন প্যানেল থেকে সার্ভারে যোগ করুন।";
+        optionsContainer.innerHTML = "";
+        document.getElementById('question-palette').innerHTML = "";
+        prevBtn.style.visibility = 'hidden';
+        nextBtn.style.visibility = 'hidden';
+        return;
+    }
+    
+    renderPalette();
+    loadQuestion(0);
+    startTimer();
+}
+
+function renderPalette() {
+    const paletteBox = document.getElementById('question-palette');
+    paletteBox.innerHTML = '';
+    currentQuestions.forEach((_, i) => {
+        let btn = document.createElement('button');
+        btn.className = 'pal-btn';
+        if (i === currentIndex) btn.classList.add('current');
+        else if (userAnswers[i] !== undefined) btn.classList.add('answered');
+        
+        btn.innerText = i + 1;
+        btn.onclick = () => loadQuestion(i);
+        paletteBox.appendChild(btn);
+    });
+}
+
+function loadQuestion(index) {
+    currentIndex = index;
+    const q = currentQuestions[index];
+    
+    document.getElementById('q-circle-num').innerText = index + 1;
+    qText.innerText = q.q;
+    
+    let html = '';
+    q.opts.forEach((opt, i) => {
+        if(opt && opt.trim() !== '') {
+            let isSelected = userAnswers[index] === i;
+            html += `
+            <div class="option-box ${isSelected ? 'selected' : ''}" onclick="selectAns(${i})">
+                <input type="radio" name="ans" ${isSelected ? 'checked' : ''}>
+                <span class="opt-label">${optionLabels[i]}.</span>
+                <span class="opt-text">${opt}</span>
+            </div>`;
+        }
+    });
+    optionsContainer.innerHTML = html;
+    
+    prevBtn.style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+    if (currentIndex === currentQuestions.length - 1) {
+        nextBtn.innerText = "শেষ প্রশ্ন";
+        nextBtn.style.background = "#ff5a79";
+    } else {
+        nextBtn.innerText = "এগিয়ে যান...";
+        nextBtn.style.background = "#20a897";
+    }
+    renderPalette();
+}
+
+window.selectAns = function(optIndex) {
+    userAnswers[currentIndex] = optIndex;
+    loadQuestion(currentIndex);
+}
+
+prevBtn.onclick = () => { if (currentIndex > 0) loadQuestion(currentIndex - 1); };
+nextBtn.onclick = () => { 
+    if (currentIndex < currentQuestions.length - 1) loadQuestion(currentIndex + 1); 
+    else window.submitExam(); 
+};
+
+window.submitExam = function() {
+    if(currentQuestions.length === 0) return;
+    clearInterval(timerInt);
+    let score = 0;
+    currentQuestions.forEach((q, i) => { if (userAnswers[i] === q.ans) score++; });
+    
+    document.getElementById('exam-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    
+    document.getElementById('result-cat').innerText = activeCat === 'Cleaner' ? 'Cleaner' : 'Load & Unload';
+    document.getElementById('final-score').innerText = score;
+    document.getElementById('total-q-count').innerText = currentQuestions.length;
+}
+
+window.restartExam = function() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('exam-screen').style.display = 'block';
+    userAnswers = {};
+    initExam();
+}
+
+// ==========================================
+//           ADMIN PANEL LOGIC (SERVER)
+// ==========================================
+
+document.getElementById('adminTrigger').onclick = () => {
+    let pass = prompt("এডমিন পাসওয়ার্ড দিন:");
+    if (pass === "1234") {
+        document.getElementById('exam-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        
+        document.getElementById('admin-cat-select').value = activeCat;
+        window.loadAdminQuestionsList();
+    } else if (pass) {
+        alert("ভুল পাসওয়ার্ড!");
+    }
+};
+
+window.closeAdmin = function() {
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('exam-screen').style.display = 'block';
+    initExam(); 
+}
+
+window.loadAdminQuestionsList = function() {
+    const selCat = document.getElementById('admin-cat-select').value;
+    document.getElementById('admin-cat-label').innerText = selCat;
+    
+    const listContainer = document.getElementById('admin-questions-list');
+    listContainer.innerHTML = '';
+    
+    const qs = allData[selCat] || [];
+    if(qs.length === 0) {
+        listContainer.innerHTML = '<p style="color:red;">সার্ভারে কোনো প্রশ্ন নেই। নতুন যোগ করুন।</p>';
+        return;
+    }
+
+    qs.forEach((q, index) => {
+        let item = document.createElement('div');
+        item.className = 'admin-q-item';
+        
+        let optsText = q.opts.map((opt, i) => {
+            return i === q.ans ? `<span style="color:#4caf50; font-weight:bold;">${opt} (সঠিক)</span>` : opt;
+        }).join(' | ');
+
+        item.innerHTML = `
+            <div>
+                <div class="admin-q-text">${index + 1}. ${q.q}</div>
+                <div class="admin-q-opts">${optsText}</div>
+            </div>
+            <button class="del-btn" onclick="deleteQuestion('${selCat}', ${index})">Delete</button>
+        `;
+        listContainer.appendChild(item);
+    });
+}
+
+window.deleteQuestion = async function(cat, index) {
+    if(confirm("সত্যিই এই প্রশ্নটি সার্ভার থেকে মুছে ফেলতে চান?")) {
+        allData[cat].splice(index, 1);
+        await saveDataToFirebase();
+        window.loadAdminQuestionsList();
+    }
+}
+
+window.quickFill = function(type) {
+    if(type === 'yesno') {
+        document.getElementById('admin-opt-a').value = 'হ্যাঁ';
+        document.getElementById('admin-opt-b').value = 'না';
+        document.getElementById('admin-opt-c').value = '';
+        document.getElementById('admin-opt-d').value = '';
+    } else if (type === 'truefalse') {
+        document.getElementById('admin-opt-a').value = 'সত্য';
+        document.getElementById('admin-opt-b').value = 'মিথ্যা';
+        document.getElementById('admin-opt-c').value = '';
+        document.getElementById('admin-opt-d').value = '';
+    } else {
+        document.getElementById('admin-opt-a').value = '';
+        document.getElementById('admin-opt-b').value = '';
+        document.getElementById('admin-opt-c').value = '';
+        document.getElementById('admin-opt-d').value = '';
+    }
+}
+
+window.addNewQuestion = async function() {
+    const selCat = document.getElementById('admin-cat-select').value;
+    const qText = document.getElementById('admin-q-text').value.trim();
+    
+    let optA = document.getElementById('admin-opt-a').value.trim();
+    let optB = document.getElementById('admin-opt-b').value.trim();
+    let optC = document.getElementById('admin-opt-c').value.trim();
+    let optD = document.getElementById('admin-opt-d').value.trim();
+    
+    if(!qText || !optA || !optB) {
+        alert("প্রশ্ন এবং অন্তত প্রথম দুটি (A ও B) অপশন দিতেই হবে!");
+        return;
+    }
+
+    let optsArray = [optA, optB]; 
+    if(optC) optsArray.push(optC);
+    if(optD) optsArray.push(optD);
+    
+    let ans = parseInt(document.getElementById('admin-correct-ans').value);
+    if(ans >= optsArray.length) {
+        alert("সঠিক উত্তর হিসেবে যে অপশন সিলেক্ট করেছেন, সেই ঘরে আপনি কোনো লেখা দেননি!");
+        return;
+    }
+
+    if(!allData[selCat]) allData[selCat] = [];
+    allData[selCat].push({ q: qText, opts: optsArray, ans: ans });
+    
+    await saveDataToFirebase();
+    
+    document.getElementById('admin-q-text').value = '';
+    window.quickFill('clear');
+    window.loadAdminQuestionsList();
+}
+
+// অ্যাপ চালু হওয়ার সাথে সাথে সার্ভার থেকে ডাটা ফেচ করবে
+fetchQuestionsFromFirebase();
+
